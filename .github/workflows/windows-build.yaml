@@ -1,0 +1,45 @@
+name: windows-build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'windows-*'
+
+jobs:
+  build-windows:
+    runs-on: Windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.0'
+          cache-dependency-path: |
+            core/go.sum
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.9
+          cache: true
+
+      - name: Get Flutter Dependency
+        run: |
+          flutter --version
+          flutter pub get
+
+      - name: Build Windows package
+        run: dart setup.dart windows --arch amd64 --env pre
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-windows-amd64
+          path: ./dist
+          overwrite: true

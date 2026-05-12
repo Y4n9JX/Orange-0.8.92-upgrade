@@ -1,0 +1,15 @@
+targets:
+  $default:
+    builders:
+      source_gen:combining_builder:
+        options:
+          build_extensions:
+            '^lib/models/{{}}.dart': 'lib/models/generated/{{}}.g.dart'
+            '^lib/providers/{{}}.dart': 'lib/providers/generated/{{}}.g.dart'
+            '^lib/database/{{}}.dart': 'lib/database/generated/{{}}.g.dart'
+            '^lib/xboard/{{}}.dart': 'lib/xboard/{{}}.g.dart'
+      freezed:
+        options:
+          build_extensions:
+            '^lib/models/{{}}.dart': 'lib/models/generated/{{}}.freezed.dart'
+            '^lib/xboard/{{}}.dart': 'lib/xboard/{{}}.freezed.dart'
