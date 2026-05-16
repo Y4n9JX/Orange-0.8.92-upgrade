@@ -64,7 +64,7 @@ Future<XBoardSDK> xboardSdk(Ref ref) async {
     
     // 4. 加载HTTP配置
     _logger.info('[XBoardSdkProvider] 加载HTTP配置...');
-    final httpConfig = await _loadHttpConfig();
+    final httpConfig = await _loadHttpConfig(proxyUrl: proxyUrl);
     _logger.info('[XBoardSdkProvider] HTTP配置加载完成');
     
     // 5. 初始化SDK
@@ -91,7 +91,7 @@ Future<XBoardSDK> xboardSdk(Ref ref) async {
 /// - User-Agent
 /// - 混淆前缀
 /// - 证书配置
-Future<HttpConfig> _loadHttpConfig() async {
+Future<HttpConfig> _loadHttpConfig({String? proxyUrl}) async {
   try {
     // 从配置文件获取加密 UA（用于 API 请求和 Caddy 认证）
     final userAgent = await UserAgentConfig.get(
@@ -113,9 +113,16 @@ Future<HttpConfig> _loadHttpConfig() async {
       enableAutoDeobfuscation: obfuscationPrefix != null,
       certificatePath: certEnabled ? certPath : null,
       enableCertificatePinning: certEnabled && certPath != null,
+      proxyUrl: proxyUrl,
     );
   } catch (e) {
     _logger.error('[XBoardSdkProvider] 加载HTTP配置失败，使用默认配置', e);
+
+    // 即使HTTP配置加载失败，也保留竞速选出的代理，避免SDK请求回退为直连。
+    if (proxyUrl != null && proxyUrl.isNotEmpty) {
+      return HttpConfig.development(proxyUrl: proxyUrl);
+    }
+
     return HttpConfig.defaultConfig();
   }
 }
