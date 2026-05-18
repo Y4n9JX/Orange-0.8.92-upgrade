@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/state.dart';
 import 'package:fl_clash/widgets/pop_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -155,6 +158,25 @@ class CommonScaffoldState extends State<CommonScaffold> {
     _isFabExtendedNotifier.dispose();
     _loadingNotifier.dispose();
     super.dispose();
+  }
+
+  Future<T?> loadingRun<T>(
+    Future<T> Function() futureFunction, {
+    String? title,
+  }) async {
+    _loadingNotifier.value = true;
+    try {
+      final res = await futureFunction();
+      _loadingNotifier.value = false;
+      return res;
+    } catch (e) {
+      globalState.showMessage(
+        title: title ?? appLocalizations.tip,
+        message: TextSpan(text: e.toString()),
+      );
+      _loadingNotifier.value = false;
+      return null;
+    }
   }
 
   void addKeyword(String keyword) {

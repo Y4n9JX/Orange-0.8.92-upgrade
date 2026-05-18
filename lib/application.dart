@@ -11,6 +11,8 @@ import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/xboard/features/auth/auth.dart';
 import 'package:fl_clash/xboard/features/initialization/initialization.dart';
+import 'package:fl_clash/xboard/features/update_check/providers/update_check_provider.dart';
+import 'package:fl_clash/xboard/features/update_check/widgets/update_dialog.dart';
 import 'package:fl_clash/xboard/router/app_router.dart' as xboard_router;
 import 'package:fl_clash/state.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,43 @@ class ApplicationState extends ConsumerState<Application> {
       appController.initLink();
       app?.initShortcuts();
       _initializeXBoard();
+      _checkForUpdates();
+    });
+  }
+
+  /// 检查应用更新
+  void _checkForUpdates() {
+    // 延迟5秒后检查更新，确保应用完全启动
+    Future.delayed(const Duration(seconds: 5), () async {
+      try {
+        debugPrint('[Application] 开始自动检查更新...');
+        final updateNotifier = ref.read(updateCheckProvider.notifier);
+        await updateNotifier.checkForUpdates();
+
+        // 检查是否有更新
+        final updateState = ref.read(updateCheckProvider);
+        final currentContext = globalState.navigatorKey.currentContext;
+        if (updateState.hasUpdate &&
+            mounted &&
+            currentContext != null &&
+            currentContext.mounted) {
+          debugPrint('[Application] 发现新版本，显示更新弹窗');
+          // 显示更新弹窗
+          showDialog(
+            context: currentContext,
+            barrierDismissible: !updateState.forceUpdate, // 强制更新时不能取消
+            builder: (context) => UpdateDialog(state: updateState),
+          );
+        } else if (updateState.error != null) {
+          debugPrint('[Application] 自动更新检查失败，忽略错误: ${updateState.error}');
+          // 自动检查失败时静默处理，不打扰用户
+        } else {
+          debugPrint('[Application] 已是最新版本');
+        }
+      } catch (e) {
+        debugPrint('[Application] 自动更新检查异常: $e');
+        // 自动检查异常时静默处理，不影响应用正常使用
+      }
     });
   }
 
