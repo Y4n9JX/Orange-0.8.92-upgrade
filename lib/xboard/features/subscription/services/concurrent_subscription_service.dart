@@ -316,6 +316,7 @@ class ConcurrentSubscriptionService {
   static Future<DataResult> _fetchEncryptedData(String url) async {
     try {
       final client = HttpClient();
+      XBoardNetworkUtils.bypassGlobalProxy(client);
       client.connectionTimeout = requestTimeout;
 
       final uri = Uri.parse(url);

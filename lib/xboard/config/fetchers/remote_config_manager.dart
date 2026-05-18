@@ -117,6 +117,7 @@ class SimpleHttpClient implements IHttpClient {
     HttpClient? client;
     try {
       client = HttpClient();
+      XBoardNetworkUtils.bypassGlobalProxy(client);
       client.badCertificateCallback = (cert, host, port) => true;
       client.connectionTimeout = timeout ?? const Duration(seconds: 10);
 
@@ -285,6 +286,7 @@ class RemoteConfigSource {
   Future<ConfigResult<Map<String, dynamic>>> fetch() async {
     try {
       final client = HttpClient();
+      XBoardNetworkUtils.bypassGlobalProxy(client);
       client.badCertificateCallback = (cert, host, port) => true;
       client.connectionTimeout = timeout;
 

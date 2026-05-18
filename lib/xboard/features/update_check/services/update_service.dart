@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
-import 'package:fl_clash/xboard/core/core.dart';
+
 import 'package:fl_clash/xboard/config/xboard_config.dart';
-import 'package:flutter/foundation.dart';
+import 'package:fl_clash/xboard/core/core.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -73,12 +74,24 @@ class UpdateService {
 
     (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
       final client = HttpClient();
-      if (kDebugMode) {
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) {
-              _logger.debug('忽略SSL证书验证: $host:$port');
-              return true;
-            };
+      // Update checks are XBoard service traffic. Keep them isolated from
+      // FlClash's global user proxy and explicitly use the bootstrap proxy
+      // selected by domain racing when available.
+      XBoardNetworkUtils.bypassGlobalProxy(client);
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+            _logger.debug('忽略SSL证书验证: $host:$port');
+            return true;
+          };
+
+      final racingResult = XBoardConfig.lastRacingResult;
+      if (racingResult != null &&
+          racingResult.useProxy &&
+          racingResult.proxyUrl != null) {
+        _logger.info(
+          '更新检查使用 XBoard 预置代理: ${XBoardNetworkUtils.maskProxyUrl(racingResult.proxyUrl)}',
+        );
+        XBoardNetworkUtils.applySocks5Proxy(client, racingResult.proxyUrl!);
       }
       return client;
     };
@@ -101,14 +114,38 @@ class UpdateService {
       }
     }
 
-    final responseData = response.data as Map<String, dynamic>;
+    final dynamic rawData = response.data;
+    final Map<String, dynamic> responseData;
+    if (rawData is Map<String, dynamic>) {
+      responseData = rawData;
+    } else if (rawData is String) {
+      final decoded = jsonDecode(rawData);
+      if (decoded is! Map<String, dynamic>) {
+        throw Exception('更新接口返回格式错误: ${decoded.runtimeType}');
+      }
+      responseData = decoded;
+    } else {
+      throw Exception('更新接口返回格式错误: ${rawData.runtimeType}');
+    }
+
     return {
       'currentVersion': currentVersion,
-      'latestVersion': responseData['latest_version']?.toString() ?? '',
+      'latestVersion':
+          responseData['latest_version']?.toString() ??
+          responseData['version']?.toString() ??
+          '',
       'hasUpdate': responseData['update_available'] == true,
-      'updateUrl': responseData['download_url']?.toString() ?? '',
-      'releaseNotes': responseData['release_notes']?.toString() ?? '',
-      'forceUpdate': responseData['force_update'] == true,
+      'updateUrl':
+          responseData['download_url']?.toString() ??
+          responseData['downloadUrl']?.toString() ??
+          '',
+      'releaseNotes':
+          responseData['release_notes']?.toString() ??
+          responseData['changelog']?.toString() ??
+          '',
+      'forceUpdate':
+          responseData['force_update'] == true ||
+          responseData['forceUpdate'] == true,
     };
   }
 

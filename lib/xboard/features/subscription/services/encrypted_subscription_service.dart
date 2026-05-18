@@ -202,6 +202,7 @@ class EncryptedSubscriptionService {
         _logger.debug('[数据获取] 第 $attempt/$maxRetries 次请求: $url');
 
         final client = HttpClient();
+        XBoardNetworkUtils.bypassGlobalProxy(client);
         client.connectionTimeout = requestTimeout;
 
         final uri = Uri.parse(url);
