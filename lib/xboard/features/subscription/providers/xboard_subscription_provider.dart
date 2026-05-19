@@ -37,7 +37,6 @@ class XBoardSubscriptionNotifier extends Notifier<List<DomainPlan>> {
     );
     try {
       _logger.info('开始加载套餐列表...');
-      _logger.info('开始加载套餐列表...');
       final planModels = await ref.read(getPlansProvider.future);
       final plans = planModels.map(_mapPlan).toList();
       final visiblePlans = plans.where((plan) => plan.isVisible).toList();
