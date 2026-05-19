@@ -88,9 +88,7 @@ class UpdateService {
       if (racingResult != null &&
           racingResult.useProxy &&
           racingResult.proxyUrl != null) {
-        _logger.info(
-          '更新检查使用 XBoard 预置代理: ${XBoardNetworkUtils.maskProxyUrl(racingResult.proxyUrl)}',
-        );
+        _logger.info('更新检查使用 XBoard 预置代理: ${racingResult.proxyUrl}');
         XBoardNetworkUtils.applySocks5Proxy(client, racingResult.proxyUrl!);
       }
       return client;

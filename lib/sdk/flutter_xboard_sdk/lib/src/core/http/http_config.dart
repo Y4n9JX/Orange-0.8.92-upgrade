@@ -189,11 +189,6 @@ class HttpConfig {
     );
   }
 
-  static String _maskProxyUrl(String? proxyUrl) {
-    if (proxyUrl == null || proxyUrl.isEmpty) return '$proxyUrl';
-    return proxyUrl.replaceFirst(RegExp(r'//([^:/@]+):([^@]+)@'), '//***:***@');
-  }
-
   @override
   String toString() {
     return 'HttpConfig('
@@ -201,7 +196,7 @@ class HttpConfig {
         'obfuscationPrefix: ${obfuscationPrefix != null ? "***" : "null"}, '
         'enableCertificatePinning: $enableCertificatePinning, '
         'ignoreCertificateHostname: $ignoreCertificateHostname, '
-        'proxyUrl: ${_maskProxyUrl(proxyUrl)}'
+        'proxyUrl: $proxyUrl'
         ')';
   }
 }

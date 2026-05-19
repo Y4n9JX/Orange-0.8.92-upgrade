@@ -59,9 +59,7 @@ Future<XBoardSDK> xboardSdk(Ref ref) async {
     final racingResult = XBoardConfig.lastRacingResult;
     if (racingResult != null && racingResult.useProxy) {
       proxyUrl = racingResult.proxyUrl;
-      _logger.info(
-        '[XBoardSdkProvider] 使用代理: ${XBoardNetworkUtils.maskProxyUrl(proxyUrl)}',
-      );
+      _logger.info('[XBoardSdkProvider] 使用代理: $proxyUrl');
     } else {
       _logger.info('[XBoardSdkProvider] 使用直连');
     }

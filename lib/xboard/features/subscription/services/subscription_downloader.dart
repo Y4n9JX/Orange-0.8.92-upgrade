@@ -167,9 +167,7 @@ class SubscriptionDownloader {
     required _CancelToken cancelToken,
     required int taskIndex,
   }) async {
-    final connectionType = useProxy
-        ? '代理(${XBoardNetworkUtils.maskProxyUrl(proxyUrl)})'
-        : '直连';
+    final connectionType = useProxy ? '代理($proxyUrl)' : '直连';
     _logger.info('[任务$taskIndex] 开始下载: $connectionType');
 
     try {

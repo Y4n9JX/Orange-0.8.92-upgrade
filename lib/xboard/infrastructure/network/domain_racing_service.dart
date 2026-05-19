@@ -216,9 +216,7 @@ class DomainRacingService {
     final stopwatch = Stopwatch()..start();
 
     try {
-      final connectionType = useProxy
-          ? '代理: ${XBoardNetworkUtils.maskProxyUrl(proxyUrl)}'
-          : '直连';
+      final connectionType = useProxy ? '代理: $proxyUrl' : '直连';
       _logger.info('[域名竞速] 开始测试域名 #$index: $domain [$connectionType]');
 
       // 构建测试URL
@@ -305,9 +303,7 @@ class DomainRacingService {
       }
 
       if (response.statusCode >= 200 && response.statusCode < 400) {
-        final connectionType = useProxy
-            ? '代理: ${XBoardNetworkUtils.maskProxyUrl(proxyUrl)}'
-            : '直连';
+        final connectionType = useProxy ? '代理: $proxyUrl' : '直连';
         _logger.info(
           '[域名竞速] 🏆 域名 #$index ($domain) [$connectionType] 测试成功，响应时间: ${stopwatch.elapsedMilliseconds}ms',
         );
@@ -408,9 +404,7 @@ class DomainRacingService {
   }
 
   static String _maskConnectionType(DomainTestResult result) {
-    return result.useProxy
-        ? '代理: ${XBoardNetworkUtils.maskProxyUrl(result.proxyUrl)}'
-        : '直连';
+    return result.useProxy ? '代理: ${result.proxyUrl}' : '直连';
   }
 
   /// 转换域名为HTTPS格式（用于SDK初始化）
@@ -484,9 +478,7 @@ class DomainRacingResult {
 
   @override
   String toString() {
-    final proxyInfo = useProxy
-        ? ' [代理: ${XBoardNetworkUtils.maskProxyUrl(proxyUrl)}]'
-        : ' [直连]';
+    final proxyInfo = useProxy ? ' [代理: $proxyUrl]' : ' [直连]';
     return 'DomainRacingResult(domain: $domain$proxyInfo, responseTime: ${responseTime}ms)';
   }
 }
@@ -543,9 +535,7 @@ class DomainTestResult {
 
   @override
   String toString() {
-    final proxyInfo = useProxy
-        ? ' [代理: ${XBoardNetworkUtils.maskProxyUrl(proxyUrl)}]'
-        : ' [直连]';
+    final proxyInfo = useProxy ? ' [代理: $proxyUrl]' : ' [直连]';
     if (success) {
       return 'DomainTestResult(domain: $domain$proxyInfo, success: $success, responseTime: ${responseTime}ms)';
     } else {

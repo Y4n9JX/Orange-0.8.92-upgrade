@@ -50,9 +50,7 @@ class StatusReportingService {
       final client = _createWebSocketClient();
       final proxyUrl = _selectedProxyUrl;
       if (proxyUrl != null) {
-        _logger.info(
-          'WebSocket 使用 XBoard 预置代理: ${XBoardNetworkUtils.maskProxyUrl(proxyUrl)}',
-        );
+        _logger.info('WebSocket 使用 XBoard 预置代理: $proxyUrl');
       }
 
       _channel = IOWebSocketChannel.connect(

@@ -63,14 +63,14 @@ class XBoardNetworkUtils {
 
     final colonIndex = hostPort.lastIndexOf(':');
     if (colonIndex == -1) {
-      throw FormatException('代理配置格式错误，缺少端口号: ${maskProxyUrl(proxyUrl)}');
+      throw FormatException('代理配置格式错误，缺少端口号: $proxyUrl');
     }
 
     final host = hostPort.substring(0, colonIndex);
     final port = hostPort.substring(colonIndex + 1);
 
     if (host.isEmpty || port.isEmpty) {
-      throw FormatException('代理配置格式错误: ${maskProxyUrl(proxyUrl)}');
+      throw FormatException('代理配置格式错误: $proxyUrl');
     }
 
     return {
@@ -79,11 +79,5 @@ class XBoardNetworkUtils {
       'username': username,
       'password': password,
     };
-  }
-
-  /// Mask credentials before writing proxy URLs to logs.
-  static String maskProxyUrl(String? proxyUrl) {
-    if (proxyUrl == null || proxyUrl.isEmpty) return '';
-    return proxyUrl.replaceFirst(RegExp(r'//([^:/@]+):([^@]+)@'), '//***:***@');
   }
 }

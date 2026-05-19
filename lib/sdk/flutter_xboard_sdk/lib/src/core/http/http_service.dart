@@ -69,9 +69,7 @@ class HttpService {
 
       // 配置代理
       if (httpConfig.proxyUrl != null && httpConfig.proxyUrl!.isNotEmpty) {
-        SdkLogger.d(
-          '[XBoardSDK] 🔌 配置代理: ${_maskProxyUrl(httpConfig.proxyUrl)}',
-        );
+        SdkLogger.d('[XBoardSDK] 🔌 配置代理: ${httpConfig.proxyUrl}');
 
         final proxyConfig = _parseProxyConfig(httpConfig.proxyUrl!);
         SdkLogger.d(
@@ -121,9 +119,7 @@ class HttpService {
           final fullUrl = options.uri.toString();
           final proxyStatus =
               httpConfig.proxyUrl != null && httpConfig.proxyUrl!.isNotEmpty;
-          final proxyInfo = proxyStatus
-              ? _maskProxyUrl(httpConfig.proxyUrl)
-              : 'DIRECT';
+          final proxyInfo = proxyStatus ? httpConfig.proxyUrl : 'DIRECT';
           SdkLogger.d(
             '[XBoardSDK] 📡 ${options.method} $fullUrl | proxy: $proxyStatus ($proxyInfo)',
           );
@@ -522,11 +518,6 @@ class HttpService {
 
   /// 获取TokenManager
   TokenManager? get tokenManager => _tokenManager;
-
-  static String _maskProxyUrl(String? proxyUrl) {
-    if (proxyUrl == null || proxyUrl.isEmpty) return '';
-    return proxyUrl.replaceFirst(RegExp(r'//([^:/@]+):([^@]+)@'), '//***:***@');
-  }
 
   /// 解析代理配置
   ///
